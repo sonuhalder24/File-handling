@@ -17,6 +17,16 @@ pkill -9 -f chrome; pkill -9 -f chromedriver
 timeout 5 /opt/google/chrome/google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --version 2>&1
 
 
+timeout 5 /opt/google/chrome/google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --user-data-dir=/tmp/chrome-fresh-test --version 2>&1
+
+
+ls /root/.config/google-chrome/SingletonLock 2>/dev/null && echo "LOCK EXISTS"
+rm -f /root/.config/google-chrome/SingletonLock
+
+
+timeout 5 /opt/google/chrome/google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --version 2>&1
+
+
 
 
 
