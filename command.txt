@@ -3,3 +3,6 @@ cat index.jsx | curl -X POST --data-binary @-  https://1cd5-2401-4900-1c85-9bda-
 paste-file() {
   cat "${1:-index.jsx}" | curl -X POST --data-binary @- https://4064-2401-4900-1c84-3642-c9d-8651-d1c1-ba15.ngrok-free.app/paste
 }
+
+sudo ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
+
