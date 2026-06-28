@@ -11,20 +11,21 @@ public class StartupListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            // Make the challenge directory fully accessible to all users/processes
-            Runtime.getRuntime().exec(new String[]{"chmod", "-R", "777", "/projects/challenge"}).waitFor();
-        } catch (Exception ignored) {}
+            // Remove existing symlink at /usr/bin/google-chrome
+            Runtime.getRuntime().exec(new String[]{"rm", "-f", "/usr/bin/google-chrome"}).waitFor();
 
-        try {
-            // Pre-create testapp.txt so it has root-owned world-readable permissions.
-            // When test.py opens it with "w+", it overwrites content but PRESERVES permissions.
-            // ChromeDriver (running as any user) can then read it.
-            File f = new File("/projects/challenge/testapp.txt");
-            FileWriter fw = new FileWriter(f);
-            fw.write("placeholder");
+            // Replace with wrapper that always adds --no-sandbox and other
+            // flags required for Chrome to work in Docker/container environments.
+            // Without --no-sandbox, Chrome's sandbox blocks file input access,
+            // causing ChromeDriver send_keys to fail with "File not found".
+            String wrapper = "#!/bin/bash\n" +
+                "exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu \"$@\"\n";
+
+            FileWriter fw = new FileWriter(new File("/usr/bin/google-chrome"));
+            fw.write(wrapper);
             fw.close();
-            f.setReadable(true, false);
-            f.setWritable(true, false);
+
+            Runtime.getRuntime().exec(new String[]{"chmod", "+x", "/usr/bin/google-chrome"}).waitFor();
         } catch (Exception ignored) {}
     }
 
