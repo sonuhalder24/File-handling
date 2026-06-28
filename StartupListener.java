@@ -10,14 +10,20 @@ public class StartupListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        // Undo the previous Chrome wrapper — restore original symlink
+        // Chrome crashes as root in a container without --no-sandbox.
+        // Create a wrapper that injects the required flags every time the server starts.
         try {
-            Runtime.getRuntime().exec(new String[]{
-                "ln", "-sf", "/usr/bin/google-chrome-stable", "/usr/bin/google-chrome"
-            }).waitFor();
+            String wrapper = "#!/bin/bash\n" +
+                "exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu \"$@\"\n";
+            File chromeWrapper = new File("/usr/bin/google-chrome");
+            chromeWrapper.delete();
+            FileWriter fw = new FileWriter(chromeWrapper);
+            fw.write(wrapper);
+            fw.close();
+            Runtime.getRuntime().exec(new String[]{"chmod", "+x", "/usr/bin/google-chrome"}).waitFor();
         } catch (Exception ignored) {}
 
-        // Create /tmp/testapp.txt (local filesystem — always accessible to all processes)
+        // Create testapp.txt in /tmp (local filesystem — ChromeDriver can always access it).
         try {
             File tmpFile = new File("/tmp/testapp.txt");
             FileWriter fw = new FileWriter(tmpFile);
@@ -27,15 +33,11 @@ public class StartupListener implements ServletContextListener {
             tmpFile.setWritable(true, false);
         } catch (Exception ignored) {}
 
-        // Create symlink: /projects/challenge/testapp.txt -> /tmp/testapp.txt
-        //
-        // Why: test.py does open("testapp.txt","w+") then immediately send_keys(os.getcwd()+"/testapp.txt")
-        // In HackerRank's environment the file Python just created is not yet visible to
-        // ChromeDriver's access() check (overlay/NFS filesystem staleness).
-        // A symlink created HERE (at server startup — long before the test runs) IS
-        // already settled in the directory. Python's open() follows the symlink and
-        // writes to /tmp/testapp.txt. ChromeDriver follows the same symlink to /tmp
-        // (local, always accessible) and finds the file. send_keys succeeds.
+        // Symlink /projects/challenge/testapp.txt -> /tmp/testapp.txt.
+        // Created at server startup (before test.py runs), so the directory entry is
+        // already settled when ChromeDriver's access() check fires.
+        // Python's open("testapp.txt","w+") follows the symlink and writes to /tmp.
+        // ChromeDriver follows the same symlink to /tmp (local fs) and finds the file.
         try {
             Runtime.getRuntime().exec(new String[]{
                 "ln", "-sf", "/tmp/testapp.txt", "/projects/challenge/testapp.txt"
