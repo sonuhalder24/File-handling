@@ -12,5 +12,13 @@ pkill -f chromedriver; pkill -f chrome
 
 curl http://localhost:8000
 
+ls -la /etc/alternatives/google-chrome 2>/dev/null
+/opt/google/chrome/google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --version 2>&1
+echo "exit: $?"
+
+
+ldd /opt/google/chrome/chrome 2>/dev/null | grep "not found"
+
+
 
 
