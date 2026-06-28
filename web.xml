@@ -6,6 +6,10 @@
 
   <display-name>FrescoFileHandler Web Application</display-name>
 
+  <listener>
+    <listener-class>com.StartupListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>FileDownloadServlet</servlet-name>
     <servlet-class>com.FileDownloadServlet</servlet-class>
