@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+  <display-name>FrescoFileHandler Web Application</display-name>
+
+  <servlet>
+    <servlet-name>FileDownloadServlet</servlet-name>
+    <servlet-class>com.FileDownloadServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <servlet-class>com.FileUploadServlet</servlet-class>
+    <multipart-config>
+      <max-file-size>10485760</max-file-size>
+      <max-request-size>10485760</max-request-size>
+    </multipart-config>
+  </servlet>
+  <servlet>
+    <servlet-name>UploadedFilesServlet</servlet-name>
+    <servlet-class>com.UploadedFilesServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>FileDownloadServlet</servlet-name>
+    <url-pattern>/downloadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <url-pattern>/fileUploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UploadedFilesServlet</servlet-name>
+    <url-pattern>/uploadedFilesServlet</url-pattern>
+  </servlet-mapping>
+
+</web-app>
