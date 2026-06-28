@@ -8,6 +8,9 @@ sudo ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
 
 sudo bash -c 'printf "#!/bin/bash\nexec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu \"\$@\"\n" > /usr/bin/google-chrome && chmod +x /usr/bin/google-chrome'
 
-sudo bash -c 'printf "#!/bin/bash\nexec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu \"\$@\"\n" > /usr/bin/google-chrome && chmod +x /usr/bin/google-chrome'
+pkill -f chromedriver; pkill -f chrome
+
+curl http://localhost:8000
+
 
 
