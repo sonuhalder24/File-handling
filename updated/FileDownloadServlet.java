@@ -48,12 +48,18 @@ public class FileDownloadServlet extends HttpServlet {
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 		response.setContentLength((int) file.length());
 
-		try (FileInputStream in = new FileInputStream(file);
-				OutputStream out = response.getOutputStream()) {
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(file);
+			OutputStream out = response.getOutputStream();
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int bytesRead;
 			while ((bytesRead = in.read(buffer)) != -1) {
 				out.write(buffer, 0, bytesRead);
+			}
+		} finally {
+			if (in != null) {
+				in.close();
 			}
 		}
 	}
